@@ -393,13 +393,14 @@ public class Preprocessing implements PreProcessingInterface {
     	File configFile = new File(parametersFile);
     	// Key that is used to know where is each parameter
     	String flag = "PARAMETER:";
+    	String flag2 = "*";
     	String separator = "=";
     	// Read the file line by line
     	try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
     	    String line = br.readLine().trim();
     	    while (line != null) {
     	    	line = line.trim();
-    	       if (line.contains(flag) && !line.contains("'" + flag + "'")) {
+    	       if (line.contains(flag) && line.contains(flag2) && !line.contains("'" + flag + "'")) {
     	    	   int paramStart = line.indexOf(flag) + flag.length();
     	    	   int separatorInd = line.indexOf(separator);
     	    	   // Parameter key and value are separated by '='
