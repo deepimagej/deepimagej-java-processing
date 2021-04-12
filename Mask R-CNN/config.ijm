@@ -16,7 +16,27 @@
 * or the comments
 *
 * *****************************************************************************
-* *****************************************************************************
+*
+* Name given to the image tensor input of the Deep Learning model.
+* Rename to the name given to the tensor that goes inside the Deep Learning model
+*
+* PARAMETER: INPUT_IMAGE = input_image
+*
+*
+* Name given to the image tensor output of the Deep Learning model that corresponds to the mask
+* of each of the objects detected.
+* Rename to the name given to that tensor in your model model
+*
+* PARAMETER: MRCNN_MASK = mrcnn_mask
+*
+*
+* Name given to the tensor output of the Deep Learning model that corresponds to the matrix
+* with the coordinates of each of the bounding box of the objects, with the class of each object
+* and with the probability of each object being a class.
+* Rename to the name given to that tensor in your model model
+*
+* PARAMETER: MRCNN_DETECTION = mrcnn_detection
+*
 *
 * Name the configurations. For example, 'COCO', 'Experiment 3', ...etc.
 * Useful if your code needs to do things differently depending on which
