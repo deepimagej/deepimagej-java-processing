@@ -45,6 +45,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import deepimagej.processing.PostProcessingInterface;
 
@@ -88,11 +89,11 @@ public class PostProcessing implements PostProcessingInterface {
         ImagePlus mask = null;
         ResultsTable detections = null;
         for (final String k : keys) {
-            if (k.contains("mrcnn_mask")) {
+            if (k.equals(CONFIG.get("MRCNN_MASK"))) {
                 mask = (ImagePlus) map.get(k);
             }
             else {
-                if (!k.contains("mrcnn_detection")) {
+                if (!k.equals(CONFIG.get("MRCNN_DETECTION"))) {
                     continue;
                 }
                 detections = (ResultsTable) map.get(k);
@@ -102,7 +103,7 @@ public class PostProcessing implements PostProcessingInterface {
         final int nDetections = getNDetections(detections);
         // If nothing was detected just return null
         if (nDetections == 0) {
-        	ERROR = "No object was detected.";
+        	ERROR = "No object was detected in the input image.";
         	return null;
         }
         // Get the detected bounding boxes from the output table in normalised coodinates
@@ -187,31 +188,40 @@ public class PostProcessing implements PostProcessingInterface {
         outMap.put(detections.getTitle(), detections);
         return outMap;
     }
-    
+
     /**
 	 * Auxiliary method to be able to change some post-processing parameters without
-	 * having to change the Java code. DeepImageJ gives the option of providing a .txt or .ijm
-	 * file in the post-processing which can act both as a macro and as a config file.
+	 * having to change the code. DeepImageJ gives the option of providing a extra
+	 * files in the post-processing which can be used for example as config files.
 	 * It can act as a config file because the needed parameters can be specified in
 	 * a comment block and the parsed by the post-processing method
-	 * @param configFile: macro file which might contain parameters for the post-processing 
+	 * @param configFiles: list of attachments. The files used by the post-processing
+	 * can then be selected by the name 
 	 */
-    public void setConfigFile(String configFile) {
-    	CONFIG_FILE_PATH = configFile;
-    	if (CONFIG_FILE_PATH == null){
-    		ERROR = "No parameter or config file provided during post-processing.";
-    		return;
-    	} else if (!CONFIG_FILE_PATH.endsWith(".ijm") && !CONFIG_FILE_PATH.endsWith(".txt")) {
-    		ERROR = "The configuration file provided during post-processing should be either .txt or .ijm.";
-    		return;
-    	} else if (!(new File(CONFIG_FILE_PATH).exists())) {
-    		ERROR = "The configuration file provided during post-processing does not exist.";
-    		return;
-    	}
-    	// Parse parameters from the config file
-    	// Parameters are saved in the HashMap 'config'
-    	getParameters(CONFIG_FILE_PATH);
-    }
+    public void setConfigFiles(ArrayList<String> configFiles) {
+	    	for (String ff : configFiles) {
+	    		String fileName = ff.substring(ff.lastIndexOf(File.separator) + 1);
+	    		if (fileName.contentEquals("config.ijm")) {
+	    	    	CONFIG_FILE_PATH = ff;
+	    	    	break;
+	    		}
+	    	}
+	    	if (CONFIG_FILE_PATH == null && configFiles.size() == 0) {
+	    		ERROR = "No parameters file or config file provided for post-processing.";
+	    		return;
+	    	} else if (CONFIG_FILE_PATH == null && configFiles.size() > 0) {
+	    		ERROR = "A configuration file was not found in the model. The configuration file"
+	    				+ "should be called 'config.ijm', please rename the config file if it is "
+	    				+ "not named correctly.";
+	    		return;
+	    	} else if (!(new File(CONFIG_FILE_PATH).exists())) {
+	    		ERROR = "The configuration file provided during post-processing does not exist.";
+	    		return;
+	    	}
+	    	// Parse parameters from the config file
+	    	// Parameters are saved in the HashMap 'config'
+	    	getParameters(CONFIG_FILE_PATH);
+	    }
     
     /**
      * Parse parameters from a file provided in the plugin.

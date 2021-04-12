@@ -38,46 +38,52 @@
 package utils;
 
 import ij.ImagePlus;
+
+import java.util.HashMap;
+
 import ij.IJ;
 
 public class MaskRcnnAnchors {
 	
-    private double IMAGE_MIN_DIM;
-    private double IMAGE_MIN_SCALE;
-    private double IMAGE_MAX_DIM;
-    private String IMAGE_RESIZE_MODE;
-    private double NUM_CLASSES;
-    private static double INPUT_SCALE;
-    private static double[] INPUT_WINDOW;
-    private static double[][] INPUT_PADDING;
-    private static double[] MEAN_PIXEL;
     private static float[] RPN_ANCHOR_SCALES;
     private static float[] RPN_ANCHOR_RATIOS;
     private static float[] BACKBONE_STRIDES;
     private static float RPN_ANCHOR_STRIDE;
-    private static float id;
-    private static int nClasses;
-    private static float scale;
     
-    static {
-        MaskRcnnAnchors.INPUT_WINDOW = new double[4];
-        MaskRcnnAnchors.INPUT_PADDING = new double[4][2];
-        MaskRcnnAnchors.MEAN_PIXEL = new double[] { 123.7, 116.8, 103.9 };
-        MaskRcnnAnchors.RPN_ANCHOR_SCALES = new float[] { 32.0f, 64.0f, 128.0f, 256.0f, 512.0f };
-        MaskRcnnAnchors.RPN_ANCHOR_RATIOS = new float[] { 0.5f, 1.0f, 2.0f };
-        MaskRcnnAnchors.BACKBONE_STRIDES = new float[] { 4.0f, 8.0f, 16.0f, 32.0f, 64.0f };
-        MaskRcnnAnchors.RPN_ANCHOR_STRIDE = 1.0f;
-        MaskRcnnAnchors.id = 0.0f;
-        MaskRcnnAnchors.nClasses = 81;
-        MaskRcnnAnchors.scale = 0.0f;
+    
+    public MaskRcnnAnchors(HashMap<String, String> config) {
+    	RPN_ANCHOR_SCALES = str2array(config.get("RPN_ANCHOR_SCALES"));
+        RPN_ANCHOR_RATIOS = str2array(config.get("RPN_ANCHOR_RATIOS"));
+        BACKBONE_STRIDES = str2array(config.get("BACKBONE_STRIDES"));
+        RPN_ANCHOR_STRIDE = Float.parseFloat(config.get("RPN_ANCHOR_STRIDE"));
     }
     
-    public MaskRcnnAnchors() {
-        this.IMAGE_MIN_DIM = 800.0;
-        this.IMAGE_MIN_SCALE = 0.0;
-        this.IMAGE_MAX_DIM = 1024.0;
-        this.IMAGE_RESIZE_MODE = "square";
-        this.NUM_CLASSES = 81.0;
+    /**
+     * Converts an array of the form '[a,b,c,d]' into a float array
+     * @param str: string representation of an array
+     * @return float array or null in the case it was not possible
+     */
+    public static float[] str2array(String str) {
+    	try {
+	    	if (str.indexOf("[") != -1)
+	    		str = str.substring(str.indexOf("[") + 1);
+	    	else if (str.indexOf("(") != -1)
+	    		str = str.substring(str.indexOf("(") + 1);
+	
+	    	if (str.indexOf("]") != -1)
+	    		str = str.substring(0, str.indexOf("]"));
+	    	else if (str.indexOf(")") != -1)
+	    		str = str.substring(0, str.indexOf(")"));
+	    	
+	    	String[] strArr = str.split(",");
+	    	float[] arr = new float[strArr.length];
+	    	for (int i = 0; i < strArr.length; i ++) {
+	    		arr[i] = Float.parseFloat(strArr[i]);
+	    	}
+	    	return arr;
+    	} catch (Exception ex){
+    		return null;
+    	}
     }
     
     public static void main(final String[] args) {

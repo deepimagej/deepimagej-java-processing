@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import deepimagej.processing.PreProcessingInterface;
@@ -61,7 +62,7 @@ public class Preprocessing implements PreProcessingInterface {
 	/**
 	 * Dictionary containing all the parameters parsed from the file
 	 */
-	private static HashMap<String, String> config = new HashMap<String, String>();
+	private static HashMap<String, String> CONFIG = new HashMap<String, String>();
 	/**
 	 * Path to the other pre-processing file provided in deepImageJ. If it contains 
 	 * either a .ijm or .txt file it will be parsed to find parameters
@@ -111,7 +112,7 @@ public class Preprocessing implements PreProcessingInterface {
         final Set<String> keys = inputMap.keySet();
         ImagePlus im = null;
         for (final String k : keys) {
-            if (k.contains("input_image")) {
+            if (k.equals(CONFIG.get("INPUT_IMAGE"))) {
                 im = (ImagePlus) inputMap.get(k);
             }
         }
@@ -129,7 +130,7 @@ public class Preprocessing implements PreProcessingInterface {
         ImagePlus result = moldInputs(im);
         if (result == null)
         	return null;
-        
+        MaskRcnnAnchors mrccAnchors = new MaskRcnnAnchors(CONFIG);
         final float[][][] imageAnchors = MaskRcnnAnchors.getAnchors(result);
         final Tensor<Float> anchors = (Tensor<Float>)Tensor.create((Object)imageAnchors, (Class)Float.class);
         
@@ -149,19 +150,28 @@ public class Preprocessing implements PreProcessingInterface {
     
     /**
 	 * Auxiliary method to be able to change some pre-processing parameters without
-	 * having to change the code. DeepImageJ gives the option of providing a .txt or .ijm
-	 * file in the pre-processing which can act both as a macro and as a config file.
+	 * having to change the code. DeepImageJ gives the option of providing a extra
+	 * files in the pre-processing which can be used for example as config files.
 	 * It can act as a config file because the needed parameters can be specified in
 	 * a comment block and the parsed by the pre-processing method
-	 * @param configFile: macro file which might contain parameters for the pre-processing 
+	 * @param configFiles: list of attachments. The files used by the pre-processing
+	 * can then be selected by the name 
 	 */
-    public void setConfigFile(String configFile) {
-    	CONFIG_FILE_PATH = configFile;
-    	if (CONFIG_FILE_PATH == null){
-    		ERROR = "No parameter or config file provided during pre-processing.";
+    public void setConfigFiles(ArrayList<String> configFiles) {
+    	for (String ff : configFiles) {
+    		String fileName = ff.substring(ff.lastIndexOf(File.separator) + 1);
+    		if (fileName.contentEquals("config.ijm")) {
+    	    	CONFIG_FILE_PATH = ff;
+    	    	break;
+    		}
+    	}
+    	if (CONFIG_FILE_PATH == null && configFiles.size() == 0) {
+    		ERROR = "No parameters file or config file provided for pre-processing.";
     		return;
-    	} else if (!CONFIG_FILE_PATH.endsWith(".ijm") && !CONFIG_FILE_PATH.endsWith(".txt")) {
-    		ERROR = "The configuration file provided during pre-processing should be either .txt or .ijm.";
+    	} else if (CONFIG_FILE_PATH == null && configFiles.size() > 0) {
+    		ERROR = "A configuration file was not found in the model. The configuration file"
+    				+ "should be called 'config.ijm', please rename the config file if it is "
+    				+ "not named correctly.";
     		return;
     	} else if (!(new File(CONFIG_FILE_PATH).exists())) {
     		ERROR = "The configuration file provided during pre-processing does not exist.";
@@ -187,11 +197,11 @@ public class Preprocessing implements PreProcessingInterface {
     	String IMAGE_RESIZE_MODE = null;
     	
     	try {
-        	IMAGE_MIN_DIM = Integer.parseInt(config.get("IMAGE_MIN_DIM"));
-        	IMAGE_MIN_SCALE = (double) Float.parseFloat(config.get("IMAGE_MIN_SCALE"));
-        	IMAGE_MAX_DIM = Integer.parseInt(config.get("IMAGE_MAX_DIM"));
-        	IMAGE_RESIZE_MODE = config.get("IMAGE_RESIZE_MODE");
-        	NUM_CLASSES = Integer.parseInt(config.get("NUM_CLASSES"));
+        	IMAGE_MIN_DIM = Integer.parseInt(CONFIG.get("IMAGE_MIN_DIM"));
+        	IMAGE_MIN_SCALE = (double) Float.parseFloat(CONFIG.get("IMAGE_MIN_SCALE"));
+        	IMAGE_MAX_DIM = Integer.parseInt(CONFIG.get("IMAGE_MAX_DIM"));
+        	IMAGE_RESIZE_MODE = CONFIG.get("IMAGE_RESIZE_MODE");
+        	NUM_CLASSES = Integer.parseInt(CONFIG.get("NUM_CLASSES"));
     	} catch (Exception ex) {
     		ERROR = "Cannot parse correctly the parameters 'IMAGE_MIN_DIM', 'IMAGE_MIN_SCALE',\n"
     				+ "'IMAGE_MAX_DIM', 'IMAGE_RESIZE_MODE' and 'NUM_CLASSES' from the config file.";
@@ -203,7 +213,7 @@ public class Preprocessing implements PreProcessingInterface {
     	if (moldedImage == null)
     		return null;
     	final float[] finalShape = { (float)moldedImage.getHeight(), (float)moldedImage.getWidth(), (float)moldedImage.getNChannels() };
-    	moldedImage = moldImage(moldedImage, config);
+    	moldedImage = moldImage(moldedImage, CONFIG);
     	
     	// Obtain the image meta data
     	PROCESSING_IMAGE_SIZE = finalShape;
@@ -386,7 +396,7 @@ public class Preprocessing implements PreProcessingInterface {
      */
     private void getParameters(String parametersFile) {
     	// Initialise the parameters dictionary
-    	config = new HashMap<String, String>();
+    	CONFIG = new HashMap<String, String>();
     	// For this particular case, because the program is going to later
     	// modify the plugin, save the path to the file in an attribute
     	CONFIG_FILE_PATH = parametersFile;
@@ -406,7 +416,7 @@ public class Preprocessing implements PreProcessingInterface {
     	    	   // Parameter key and value are separated by '='
     	    	   String key = line.substring(paramStart, separatorInd).trim();
     	    	   String value = line.substring(separatorInd + 1).trim();
-    	    	   config.put(key, value);
+    	    	   CONFIG.put(key, value);
     	       }
     	       line = br.readLine();
     	    }
@@ -415,7 +425,7 @@ public class Preprocessing implements PreProcessingInterface {
 			ERROR = "Could not access the config file provided during pre-preocessing:\n"
 					+ "- " + parametersFile;
 			e.printStackTrace();
-			config = null;
+			CONFIG = null;
 		}
     }
     
