@@ -34,6 +34,7 @@
  * You should have received a copy of the GNU General Public License along with DeepImageJ. 
  * If not, see <http://www.gnu.org/licenses/>.
  */
+package maskrcnn;
 
 import ij.process.ImageProcessor;
 import java.util.Set;

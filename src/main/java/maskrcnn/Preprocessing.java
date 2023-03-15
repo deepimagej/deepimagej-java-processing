@@ -34,15 +34,18 @@
  * You should have received a copy of the GNU General Public License along with DeepImageJ. 
  * If not, see <http://www.gnu.org/licenses/>.
  */
+package maskrcnn;
 
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
-import java.util.Set;
-import utils.MaskRcnnMetas;
-import org.tensorflow.Tensor;
+import io.bioimage.modelrunner.tensor.Tensor;
+import maskrcnn.utils.ImageProcessingUtils;
+import maskrcnn.utils.MaskRcnnAnchors;
+import maskrcnn.utils.MaskRcnnMetas;
+import net.imglib2.type.numeric.real.FloatType;
 
-import utils.ImageProcessingUtils;
-import utils.MaskRcnnAnchors;
+import java.util.Set;
+
 import ij.IJ;
 import ij.ImagePlus;
 
@@ -132,11 +135,11 @@ public class Preprocessing implements PreProcessingInterface {
         	return null;
         MaskRcnnAnchors mrccAnchors = new MaskRcnnAnchors(CONFIG);
         final float[][][] imageAnchors = MaskRcnnAnchors.getAnchors(result);
-        final Tensor<Float> anchors = (Tensor<Float>)Tensor.create((Object)imageAnchors, (Class)Float.class);
+        final Tensor<FloatType> anchors = (Tensor<Float>)Tensor.create((Object)imageAnchors, (Class)Float.class);
         
         //final float[][] imageMetas = MaskRcnnMetas.composeImageMeta(im);
         final float[][] imageMetas = MaskRcnnMetas.composeImageMeta(0.0f, ORIGINAL_IMAGE_SIZE, PROCESSING_IMAGE_SIZE, WINDOW_SIZE, (float) SCALE, NUM_CLASSES);
-        final Tensor<Float> metas = (Tensor<Float>)Tensor.create((Object)imageMetas, (Class)Float.class);
+        final Tensor<FloatType> metas = (Tensor<Float>)Tensor.create((Object)imageMetas, (Class)Float.class);
         
         // Write the runtime parameters to the config file so it can be used by post processing
         writeToConfigFile(CONFIG_FILE_PATH);

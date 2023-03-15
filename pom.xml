@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>34.1.0</version>
+		<relativePath />
+	</parent>
+ 	<groupId>io.bioimage</groupId>
+ 	<artifactId>deepimagej-java-processing</artifactId>
+ 	<version>1.0.0-SNAPSHOT</version>
+ 	<name>Java pre- and post-processing for deepImageJ models</name>
+ 	<description>A collection of Java libraries to pre- or post-process deepImageJ models</description>
+	<inceptionYear>2019</inceptionYear>
+	<organization>
+		<name>DeepImageJ</name>
+		<url>https://deepimagej.github.io/deepimagej/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Simplified BSD License</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>carlosuc3m</id>
+			<name>Carlos Garcia-Lopez-de-Haro</name>
+			<url>https://github.com/carlosuc3m</url>
+			<roles>
+				<role>founder</role>
+				<role>lead</role>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+	</developers>
+	<mailingLists>
+		<mailingList>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc/tags/deepimagej</archive>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git://github.com/deepimagej/deepimagej-java-processing</connection>
+		<developerConnection>scm:git:git@github.com:deepimagej/deepimagej-java-processing</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/deepimagej/deepimagej-java-processing</url>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/deepimagej/deepimagej-java-processing/issues</url>
+	</issueManagement>
+
+	<properties>
+		<main-class>DeepImageJ_Run</main-class>
+		<automatic-module-name>io.github.deepimagej</automatic-module-name>
+
+		<license.licenseName>bsd_2</license.licenseName>
+		<license.copyrightOwners>Ecole Polytechnique Federale de Lausanne and
+Universidad Carlos III de Madrid.</license.copyrightOwners>
+
+		<!-- NB: Deploy releases to the SciJava Maven repository. -->
+		<releaseProfiles>deploy-to-scijava</releaseProfiles>
+
+		<jna.version>5.11.0</jna.version>
+	</properties>
+	<repositories>
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<!--		MODEL RUNNER-->
+		<dependency>
+			<groupId>io.bioimage</groupId>
+			<artifactId>dl-modelrunner</artifactId>
+			<version>0.2.0</version>
+		</dependency>
+		<!--		MODEL RUNNER-->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+		</dependency>
+		<!-- Test scope dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

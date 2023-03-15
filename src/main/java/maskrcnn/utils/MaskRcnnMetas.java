@@ -35,7 +35,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package utils;
+package maskrcnn.utils;
 
 import ij.ImagePlus;
 import ij.IJ;
