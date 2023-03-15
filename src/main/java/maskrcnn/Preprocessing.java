@@ -38,10 +38,11 @@ package maskrcnn;
 
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
-import io.bioimage.modelrunner.tensor.Tensor;
 import maskrcnn.utils.ImageProcessingUtils;
+import maskrcnn.utils.ImgLib2Builder;
 import maskrcnn.utils.MaskRcnnAnchors;
 import maskrcnn.utils.MaskRcnnMetas;
+import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.FloatType;
 
 import java.util.Set;
@@ -135,11 +136,11 @@ public class Preprocessing implements PreProcessingInterface {
         	return null;
         MaskRcnnAnchors mrccAnchors = new MaskRcnnAnchors(CONFIG);
         final float[][][] imageAnchors = MaskRcnnAnchors.getAnchors(result);
-        final Tensor<FloatType> anchors = (Tensor<Float>)Tensor.create((Object)imageAnchors, (Class)Float.class);
+        final Img<FloatType> anchors = ImgLib2Builder.createTensorFromArray(imageAnchors);
         
         //final float[][] imageMetas = MaskRcnnMetas.composeImageMeta(im);
         final float[][] imageMetas = MaskRcnnMetas.composeImageMeta(0.0f, ORIGINAL_IMAGE_SIZE, PROCESSING_IMAGE_SIZE, WINDOW_SIZE, (float) SCALE, NUM_CLASSES);
-        final Tensor<FloatType> metas = (Tensor<Float>)Tensor.create((Object)imageMetas, (Class)Float.class);
+        final Img<FloatType> metas = ImgLib2Builder.createTensorFromArray(imageMetas);
         
         // Write the runtime parameters to the config file so it can be used by post processing
         writeToConfigFile(CONFIG_FILE_PATH);
