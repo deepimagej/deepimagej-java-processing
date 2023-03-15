@@ -42,9 +42,22 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
 
+/**
+ * Class to create ImgLib2 images from arrays
+ * 
+ * @author Carlos Javier Garcia Lopez de Haro
+ *
+ */
 public class ImgLib2Builder {
 
-    
+    /**
+     * Create an ImgLib2 image from a flat array
+     * @param flatArr
+     * 	flat array with the data
+     * @param tensorShape
+     * 	shape of the wanted image
+     * @return the image filled with the data from the array in the corresponding shape
+     */
     public static Img<FloatType> createTensorFromArray(float[] flatArr, long[] tensorShape){
 		final ArrayImgFactory<FloatType> factory = new ArrayImgFactory<>(new FloatType());
 		final Img<FloatType> outputImg = factory.create(tensorShape);
@@ -60,7 +73,32 @@ public class ImgLib2Builder {
 		return outputImg;
     }
     
+    /**
+     * Create a 1D ImgLib2 img from a 1D array
+     * @param flatArr
+     * 	the array with the data
+     * @return the resulting ImgLib2 image equivalent to the flatArr
+     */
+    public static Img<FloatType> createTensorFromArray(float[] flatArr){
+    	long[] tensorShape = new long[] {flatArr.length};
+		final ArrayImgFactory<FloatType> factory = new ArrayImgFactory<>(new FloatType());
+		final Img<FloatType> outputImg = factory.create(tensorShape);
+		Cursor<FloatType> tensorCursor = outputImg.cursor();
+		while (tensorCursor.hasNext()) {
+			tensorCursor.fwd();
+			long[] cursorPos = tensorCursor.positionAsLongArray();
+			float val = flatArr[(int) cursorPos[0]];
+			tensorCursor.get().set(val);
+		}
+		return outputImg;
+    }
     
+    /**
+     * Create a 2D ImgLib2 img from a 2D array
+     * @param flatArr
+     * 	the array with the data
+     * @return the resulting ImgLib2 image equivalent to the flatArr
+     */
     public static Img<FloatType> createTensorFromArray(float[][] flatArr){
     	long[] tensorShape = new long[] {flatArr.length, flatArr[0].length};
 		final ArrayImgFactory<FloatType> factory = new ArrayImgFactory<>(new FloatType());
@@ -74,8 +112,13 @@ public class ImgLib2Builder {
 		}
 		return outputImg;
     }
-    
-    
+
+    /**
+     * Create a 3D ImgLib2 img from a 3D array
+     * @param flatArr
+     * 	the array with the data
+     * @return the resulting ImgLib2 image equivalent to the flatArr
+     */
     public static Img<FloatType> createTensorFromArray(float[][][] flatArr){
     	long[] tensorShape = new long[] {flatArr.length, flatArr[0].length, flatArr[0][0].length};
 		final ArrayImgFactory<FloatType> factory = new ArrayImgFactory<>(new FloatType());
@@ -89,8 +132,13 @@ public class ImgLib2Builder {
 		}
 		return outputImg;
     }
-    
-    
+
+    /**
+     * Create a 4D ImgLib2 img from a 4D array
+     * @param flatArr
+     * 	the array with the data
+     * @return the resulting ImgLib2 image equivalent to the flatArr
+     */
     public static Img<FloatType> createTensorFromArray(float[][][][] flatArr){
     	long[] tensorShape = new long[] {flatArr.length, flatArr[0].length, 
     			flatArr[0][0].length, flatArr[0][0][0].length};
@@ -105,8 +153,13 @@ public class ImgLib2Builder {
 		}
 		return outputImg;
     }
-    
-    
+
+    /**
+     * Create a 5D ImgLib2 img from a 5D array
+     * @param flatArr
+     * 	the array with the data
+     * @return the resulting ImgLib2 image equivalent to the flatArr
+     */
     public static Img<FloatType> createTensorFromArray(float[][][][][] flatArr){
     	long[] tensorShape = new long[] {flatArr.length, flatArr[0].length, 
     			flatArr[0][0].length, flatArr[0][0][0].length, flatArr[0][0][0][0].length};
